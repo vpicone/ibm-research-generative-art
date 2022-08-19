@@ -1,0 +1,19 @@
+{
+  "name": "ibm-research-generative-art",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "mechanic dev",
+    "build": "mechanic build",
+    "serve": "mechanic serve",
+    "new": "mechanic new function"
+  },
+  "devDependencies": {
+    "@mechanic-design/cli": "^2.0.0-beta.9",
+    "@mechanic-design/core": "^2.0.0-beta.9"
+  },
+  "dependencies": {
+    "@carbon/elements": "^11.7.0",
+    "@mechanic-design/engine-p5": "^2.0.0-beta.9",
+    "camel-case": "^4.1.2"
+  }
+}
