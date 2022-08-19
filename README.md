@@ -1,3 +1,5 @@
-## IBM Research Generative Art
+## IBM Research Generative Art&nbsp;&nbsp;|&nbsp;&nbsp;[Demo](https://ibm-research-generative-art.vercel.app)
 
-`npm run dev`
+### Development
+- `npm run dev`
+- Built with [Mechanic](https://mechanic.design/)
