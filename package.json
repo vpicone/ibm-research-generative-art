@@ -1,6 +1,10 @@
 {
   "name": "ibm-research-generative-art",
   "version": "0.0.0",
+  "author": {
+    "name": "Vince Picone",
+    "email": "vp@vincepic.one"
+  },
   "scripts": {
     "dev": "mechanic dev",
     "build": "mechanic build",
