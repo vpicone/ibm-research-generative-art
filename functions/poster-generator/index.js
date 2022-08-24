@@ -1,7 +1,7 @@
-import { choice, flipCoin, randInt, getCarbonColor } from "./utils.js";
+import { choice, flipCoin, randInt } from "./utils.js";
 
 import "./styles.css";
-
+import { white, g10, g90, g100 } from "@carbon/themes";
 import pcb from "./assets/overlays/pcb.jpg";
 import pointing from "./assets/overlays/pointing.jpg";
 import walking from "./assets/overlays/walking.jpg";
@@ -14,13 +14,17 @@ import selectric from "./assets/subjects/selectric.png";
 const overlaysAssets = { pcb, pointing, walking, wires };
 const subjectsAssets = { ball, ai, selectric };
 
+const carbonThemes = { white, g10, g90, g100 };
+
+// Tint pallete adjusts to theme
+
 export const handler = ({ inputs, mechanic, sketch }) => {
   const {
     width,
     height,
     subject,
     overlay,
-    background,
+    theme,
     tint,
     subjectOverride,
     subjectGrayscale,
@@ -32,9 +36,11 @@ export const handler = ({ inputs, mechanic, sketch }) => {
   let selectedSubject;
   let selectedOverlay;
   let selectedSubjectOverride;
+  let selectedTheme;
+  let selectedTint;
 
   const setStyleBase = () => {
-    sketch.background(getCarbonColor(background));
+    sketch.background(selectedTheme.background);
   };
 
   const loadImages = () => {
@@ -48,6 +54,54 @@ export const handler = ({ inputs, mechanic, sketch }) => {
       selectedSubjectOverride = sketch.loadImage(
         URL.createObjectURL(subjectOverride)
       );
+    }
+  };
+
+  const setTheme = () => {
+    if (!Object.keys(carbonThemes).includes(theme)) {
+      // Random or undefined theme
+      const options = Object.keys(carbonThemes);
+      selectedTheme =
+        carbonThemes[options[Math.floor(Math.random() * options.length)]];
+    } else {
+      selectedTheme = carbonThemes[theme];
+    }
+  };
+
+  const setTint = () => {
+    const {
+      supportError,
+      supportWarning,
+      supportSuccess,
+      supportInfo,
+      supportCautionUndefined,
+    } = selectedTheme;
+    switch (tint) {
+      case "Red":
+        selectedTint = supportError;
+        break;
+      case "Yellow":
+        selectedTint = supportWarning;
+        break;
+      case "Green":
+        selectedTint = supportSuccess;
+        break;
+      case "Blue":
+        selectedTint = supportInfo;
+        break;
+      case "Purple":
+        selectedTint = supportCautionUndefined;
+        break;
+      default:
+        const options = [
+          supportError,
+          supportWarning,
+          supportSuccess,
+          supportInfo,
+          supportCautionUndefined,
+        ];
+        const randomTint = options[Math.floor(Math.random() * options.length)];
+        selectedTint = randomTint;
     }
   };
 
@@ -80,12 +134,13 @@ export const handler = ({ inputs, mechanic, sketch }) => {
 
   sketch.setup = () => {
     sketch.createCanvas(width, height);
+    setTheme();
+    setTint();
     setOverlay();
     setSubject();
   };
 
   const drawSubject = () => {
-    console.log(selectedSubject);
     const cutoutX =
       Math.random() > 0.5 ? sketch.width * 0.3 : sketch.width * 0.7;
     selectedSubject.resize(0, sketch.height * 0.5);
@@ -108,7 +163,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     const boxWidth = sketch.width / numCols;
     const boxHeight = sketch.height / numRows;
 
-    const tintColor = sketch.color(tint);
+    const tintColor = sketch.color(selectedTint);
     tintColor.setAlpha(Math.min(Math.floor(Math.random() * 200 + 126, 255)));
     sketch.tint(tintColor);
     for (let i = 0; i < numRows; i++) {
@@ -139,7 +194,6 @@ export const handler = ({ inputs, mechanic, sketch }) => {
   };
 
   sketch.draw = () => {
-    getCarbonColor("Gray 10");
     setStyleBase();
 
     drawOverlay();
@@ -152,6 +206,8 @@ export const handler = ({ inputs, mechanic, sketch }) => {
   sketch.mousePressed = () => {
     setOverlay();
     setSubject();
+    setTheme();
+    setTint();
     sketch.redraw();
   };
 };
@@ -178,30 +234,18 @@ export const inputs = {
     type: "number",
     default: 1080,
   },
-  background: {
+  theme: {
     type: "text",
-    default: "Gray 100",
-    options: [
-      "Gray 10",
-      "Gray 20",
-      "Gray 30",
-      "Gray 40",
-      "Gray 50",
-      "Gray 60",
-      "Gray 70",
-      "Gray 80",
-      "Gray 90",
-      "Gray 100",
-    ],
-    label: "Background color",
+    default: "Random",
+    options: ["Random", "white", "g10", "g90", "g100"],
+    label: "Carbon theme",
   },
   tint: {
-    type: "color",
-    default: "#4589ff",
-    model: "hex",
+    type: "text",
+    default: "Random",
+    options: ["Random", "Red", "Yellow", "Green", "Blue", "Purple"],
     label: "Overlay tint",
   },
-
   subjectOverride: {
     type: "image",
     label: "Custom subject image",
