@@ -22,11 +22,10 @@ export const handler = ({ inputs, mechanic, sketch }) => {
   const {
     width,
     height,
-    subject,
-    overlay,
+    subjectImage,
+    overlayImage,
     theme,
     tint,
-    subjectOverride,
     subjectGrayscale,
   } = inputs;
 
@@ -35,26 +34,11 @@ export const handler = ({ inputs, mechanic, sketch }) => {
 
   let selectedSubject;
   let selectedOverlay;
-  let selectedSubjectOverride;
   let selectedTheme;
   let selectedTint;
 
   const setStyleBase = () => {
     sketch.background(selectedTheme.background);
-  };
-
-  const loadImages = () => {
-    Object.keys(overlaysAssets).forEach((key) => {
-      overlays[key] = sketch.loadImage(overlaysAssets[key]);
-    });
-    Object.keys(subjectsAssets).forEach((key) => {
-      subjects[key] = sketch.loadImage(subjectsAssets[key]);
-    });
-    if (subjectOverride) {
-      selectedSubjectOverride = sketch.loadImage(
-        URL.createObjectURL(subjectOverride)
-      );
-    }
   };
 
   const setTheme = () => {
@@ -105,39 +89,19 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     }
   };
 
-  const setOverlay = () => {
-    const options = Object.keys(overlays);
-    if (overlay === "random" || !options.includes(overlay)) {
-      selectedOverlay = overlays[choice(options)];
-    } else {
-      selectedOverlay = overlays[overlay];
-    }
-  };
-
-  const setSubject = () => {
-    if (selectedSubjectOverride) {
-      selectedSubject = selectedSubjectOverride;
-      return;
-    }
-
-    const options = Object.keys(subjects);
-    if (subject === "random" || !options.includes(subject)) {
-      selectedSubject = subjects[choice(options)];
-    } else {
-      selectedSubject = subjects[subject];
-    }
-  };
-
   sketch.preload = () => {
-    loadImages();
+    selectedSubject = sketch.loadImage(
+      subjectImage ? URL.createObjectURL(subjectImage) : ball
+    );
+    selectedOverlay = sketch.loadImage(
+      overlayImage ? URL.createObjectURL(overlayImage) : pcb
+    );
   };
 
   sketch.setup = () => {
     sketch.createCanvas(width, height);
     setTheme();
     setTint();
-    setOverlay();
-    setSubject();
   };
 
   const drawSubject = () => {
@@ -202,28 +166,15 @@ export const handler = ({ inputs, mechanic, sketch }) => {
 
     mechanic.done();
   };
-
-  sketch.mousePressed = () => {
-    setOverlay();
-    setSubject();
-    setTheme();
-    setTint();
-    sketch.redraw();
-  };
 };
 
 export const inputs = {
-  subject: {
-    type: "text",
-    default: "random",
-    options: ["random", "ball", "ai", "selectric"],
+  subjectImage: {
+    type: "image",
     label: "Subject image",
   },
-
-  overlay: {
-    type: "text",
-    default: "random",
-    options: ["random", "pcb", "pointing", "walking", "wires"],
+  overlayImage: {
+    type: "image",
     label: "Overlay image",
   },
   width: {
@@ -245,10 +196,6 @@ export const inputs = {
     default: "Random",
     options: ["Random", "Red", "Yellow", "Green", "Blue", "Purple"],
     label: "Overlay tint",
-  },
-  subjectOverride: {
-    type: "image",
-    label: "Custom subject image",
   },
   subjectGrayscale: {
     type: "boolean",
