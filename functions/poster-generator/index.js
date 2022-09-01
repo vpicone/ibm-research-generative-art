@@ -1,5 +1,4 @@
-import { choice, flipCoin, randInt } from "./utils.js";
-
+// import { choice, flipCoin, randInt } from "./utils.js";
 import "./styles.css";
 import { white, g10, g90, g100 } from "@carbon/themes";
 import pcb from "./assets/overlays/pcb.jpg";
@@ -24,22 +23,17 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     height,
     subjectImage,
     overlayImage,
+    backgroundImage,
     theme,
     tint,
     subjectGrayscale,
   } = inputs;
 
-  const overlays = {};
-  const subjects = {};
-
   let selectedSubject;
   let selectedOverlay;
+  let selectedBackground;
   let selectedTheme;
   let selectedTint;
-
-  const setStyleBase = () => {
-    sketch.background(selectedTheme.background);
-  };
 
   const setTheme = () => {
     if (!Object.keys(carbonThemes).includes(theme)) {
@@ -96,12 +90,18 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     selectedOverlay = sketch.loadImage(
       overlayImage ? URL.createObjectURL(overlayImage) : pcb
     );
+    if (backgroundImage) {
+      selectedBackground = sketch.loadImage(
+        URL.createObjectURL(backgroundImage)
+      );
+    }
   };
 
-  sketch.setup = () => {
-    sketch.createCanvas(width, height);
-    setTheme();
-    setTint();
+  const drawBackground = () => {
+    sketch.background(selectedTheme.background);
+    if (selectedBackground) {
+      sketch.background(selectedBackground);
+    }
   };
 
   const drawSubject = () => {
@@ -157,8 +157,14 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     sketch.noTint();
   };
 
+  sketch.setup = () => {
+    sketch.createCanvas(width, height);
+    setTheme();
+    setTint();
+  };
+
   sketch.draw = () => {
-    setStyleBase();
+    drawBackground();
 
     drawOverlay();
     drawSubject();
@@ -176,6 +182,10 @@ export const inputs = {
   overlayImage: {
     type: "image",
     label: "Overlay image",
+  },
+  backgroundImage: {
+    type: "image",
+    label: "Background image",
   },
   width: {
     type: "number",
