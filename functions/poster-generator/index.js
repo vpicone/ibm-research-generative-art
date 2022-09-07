@@ -10,6 +10,8 @@ import ball from "./assets/subjects/ball.png";
 import ai from "./assets/subjects/ai.png";
 import selectric from "./assets/subjects/selectric.png";
 
+import { choice } from "./utils";
+
 const overlaysAssets = { pcb, pointing, walking, wires };
 const subjectsAssets = { ball, ai, selectric };
 
@@ -34,7 +36,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
   let selectedBackground;
   let selectedTheme;
   let selectedTint;
-
+  console.log({ subjectImage, selectedSubject });
   const setTheme = () => {
     if (!Object.keys(carbonThemes).includes(theme)) {
       // Random or undefined theme
@@ -106,15 +108,20 @@ export const handler = ({ inputs, mechanic, sketch }) => {
 
   const drawSubject = () => {
     const cutoutX =
-      Math.random() > 0.5 ? sketch.width * 0.3 : sketch.width * 0.7;
-    selectedSubject.resize(0, sketch.height * 0.5);
+      choice([0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875]) * sketch.width;
+    const cutoutY = choice([0.25, 0.5, 0.75]) * sketch.height;
+    const cutoutScale = choice([0.5, 0.75, 1.0]);
+
+    console.log({ cutoutX, cutoutY, cutoutScale });
+
+    selectedSubject.resize(0, sketch.height * cutoutScale);
 
     if (subjectGrayscale) {
       selectedSubject.filter(sketch.GRAY);
     }
 
     sketch.imageMode(sketch.CENTER);
-    sketch.image(selectedSubject, cutoutX, sketch.height / 2);
+    sketch.image(selectedSubject, cutoutX, cutoutY);
     sketch.imageMode(sketch.CORNER);
   };
 
