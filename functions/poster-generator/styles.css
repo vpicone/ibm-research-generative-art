@@ -1,18 +1,22 @@
 @font-face {
-    font-family: "IBM Plex Mono";
-    src: url("./assets/IBMPlexMono-Regular.otf") format("opentype");
+  font-family: "IBM Plex Mono";
+  src: url("./assets/IBMPlexMono-Regular.otf") format("opentype");
 }
 @font-face {
-    font-family: "IBM Plex Mono";
-    src: url("./assets/IBMPlexMono-Bold.otf") format("opentype");
-    font-weight: bold;
+  font-family: "IBM Plex Mono";
+  src: url("./assets/IBMPlexMono-Bold.otf") format("opentype");
+  font-weight: bold;
 }
 
 * {
-    font-family: "IBM Plex Mono" !important;
+  font-family: "IBM Plex Mono" !important;
 }
 
 h2 {
-    font-weight: bold;
-    font-size: 2.4em !important;
+  font-weight: bold;
+  font-size: 2.4em !important;
+}
+
+.NumberInput-module__range-number-input {
+  overflow-x: initial;
 }

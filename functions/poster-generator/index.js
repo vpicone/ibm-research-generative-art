@@ -28,7 +28,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     backgroundImage,
     theme,
     tint,
-    subjectGrayscale,
+    cubiness,
   } = inputs;
 
   let selectedSubject;
@@ -36,7 +36,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
   let selectedBackground;
   let selectedTheme;
   let selectedTint;
-  console.log({ subjectImage, selectedSubject });
+
   const setTheme = () => {
     if (!Object.keys(carbonThemes).includes(theme)) {
       // Random or undefined theme
@@ -116,10 +116,6 @@ export const handler = ({ inputs, mechanic, sketch }) => {
 
     selectedSubject.resize(0, sketch.height * cutoutScale);
 
-    if (subjectGrayscale) {
-      selectedSubject.filter(sketch.GRAY);
-    }
-
     sketch.imageMode(sketch.CENTER);
     sketch.image(selectedSubject, cutoutX, cutoutY);
     sketch.imageMode(sketch.CORNER);
@@ -146,7 +142,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
           Math.min(Math.floor(Math.random() * 255 + 126, 255))
         );
         sketch.tint(tintColor);
-        if (Math.random() > 0.75) {
+        if (Math.random() < (0.5 * cubiness) / 10) {
           sketch.image(
             selectedOverlay,
             x,
@@ -190,17 +186,18 @@ export const inputs = {
     type: "image",
     label: "Overlay image",
   },
+  cubiness: {
+    type: "number",
+    label: "Cubiness",
+    default: 5,
+    min: 0,
+    max: 10,
+    step: 1,
+    slider: true,
+  },
   backgroundImage: {
     type: "image",
     label: "Background image",
-  },
-  width: {
-    type: "number",
-    default: 1920,
-  },
-  height: {
-    type: "number",
-    default: 1080,
   },
   theme: {
     type: "text",
@@ -214,10 +211,13 @@ export const inputs = {
     options: ["Random", "Red", "Yellow", "Green", "Blue", "Purple"],
     label: "Overlay tint",
   },
-  subjectGrayscale: {
-    type: "boolean",
-    default: true,
-    label: "Grayscale subject image",
+  width: {
+    type: "number",
+    default: 1920,
+  },
+  height: {
+    type: "number",
+    default: 1080,
   },
 };
 
