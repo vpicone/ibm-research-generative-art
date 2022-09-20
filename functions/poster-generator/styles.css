@@ -20,7 +20,3 @@ h2 {
 .NumberInput-module__range-number-input {
   overflow-x: initial;
 }
-
-.SideBar-module__row:first-of-type {
-  display: none;
-}
