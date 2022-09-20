@@ -1,6 +1,6 @@
 // import { choice, flipCoin, randInt } from "./utils.js";
 import "./styles.css";
-import { white, g10, g90, g100 } from "@carbon/themes";
+import { teal, blue, green, coolGray } from "@carbon/colors";
 import pcb from "./assets/overlays/pcb.jpg";
 import pointing from "./assets/overlays/pointing.jpg";
 import walking from "./assets/overlays/walking.jpg";
@@ -15,8 +15,6 @@ import { choice } from "./utils";
 const overlaysAssets = { pcb, pointing, walking, wires };
 const subjectsAssets = { ball, ai, selectric };
 
-const carbonThemes = { white, g10, g90, g100 };
-
 // Tint pallete adjusts to theme
 
 export const handler = ({ inputs, mechanic, sketch }) => {
@@ -26,62 +24,45 @@ export const handler = ({ inputs, mechanic, sketch }) => {
     subjectImage,
     overlayImage,
     backgroundImage,
-    theme,
-    tint,
+    overlayTint,
+    overlayColor,
+    backgroundColor,
     cubiness,
   } = inputs;
 
   let selectedSubject;
   let selectedOverlay;
   let selectedBackground;
-  let selectedTheme;
   let selectedTint;
 
-  const setTheme = () => {
-    if (!Object.keys(carbonThemes).includes(theme)) {
-      // Random or undefined theme
-      const options = Object.keys(carbonThemes);
-      selectedTheme =
-        carbonThemes[options[Math.floor(Math.random() * options.length)]];
+  const getTint = (color) => {
+    const options = [10, 30, 60, 90];
+    if (overlayTint === "Random") {
+      const randomTint = options[Math.floor(Math.random() * options.length)];
+      return color[randomTint];
     } else {
-      selectedTheme = carbonThemes[theme];
+      return color[overlayTint];
     }
   };
 
-  const setTint = () => {
-    const {
-      supportError,
-      supportWarning,
-      supportSuccess,
-      supportInfo,
-      supportCautionUndefined,
-    } = selectedTheme;
-    switch (tint) {
-      case "Red":
-        selectedTint = supportError;
-        break;
-      case "Yellow":
-        selectedTint = supportWarning;
-        break;
-      case "Green":
-        selectedTint = supportSuccess;
+  const setColor = () => {
+    switch (overlayColor) {
+      case "Teal":
+        selectedTint = getTint(teal);
         break;
       case "Blue":
-        selectedTint = supportInfo;
+        selectedTint = getTint(blue);
         break;
-      case "Purple":
-        selectedTint = supportCautionUndefined;
+      case "Green":
+        selectedTint = getTint(green);
+        break;
+      case "Cool gray":
+        selectedTint = getTint(coolGray);
         break;
       default:
-        const options = [
-          supportError,
-          supportWarning,
-          supportSuccess,
-          supportInfo,
-          supportCautionUndefined,
-        ];
-        const randomTint = options[Math.floor(Math.random() * options.length)];
-        selectedTint = randomTint;
+        const options = [teal, blue, green, coolGray];
+        const randomColor = options[Math.floor(Math.random() * options.length)];
+        selectedTint = getTint(randomColor);
     }
   };
 
@@ -100,7 +81,18 @@ export const handler = ({ inputs, mechanic, sketch }) => {
   };
 
   const drawBackground = () => {
-    sketch.background(selectedTheme.background);
+    if (backgroundColor === "Light") {
+      sketch.background(coolGray[10]);
+    }
+    if (backgroundColor === "Dark") {
+      sketch.background(coolGray[100]);
+    }
+    if (backgroundColor === "Random") {
+      const options = [coolGray[10], coolGray[100]];
+      const randomBackground =
+        options[Math.floor(Math.random() * options.length)];
+      sketch.background(randomBackground);
+    }
     if (selectedBackground) {
       sketch.background(selectedBackground);
     }
@@ -111,8 +103,6 @@ export const handler = ({ inputs, mechanic, sketch }) => {
       choice([0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875]) * sketch.width;
     const cutoutY = choice([0.25, 0.5, 0.75]) * sketch.height;
     const cutoutScale = choice([0.5, 0.75, 1.0]);
-
-    console.log({ cutoutX, cutoutY, cutoutScale });
 
     selectedSubject.resize(0, sketch.height * cutoutScale);
 
@@ -162,8 +152,7 @@ export const handler = ({ inputs, mechanic, sketch }) => {
 
   sketch.setup = () => {
     sketch.createCanvas(width, height);
-    setTheme();
-    setTint();
+    setColor();
   };
 
   sketch.draw = () => {
@@ -178,9 +167,21 @@ export const handler = ({ inputs, mechanic, sketch }) => {
 };
 
 export const inputs = {
+  width: {
+    type: "number",
+    default: 1920,
+  },
+  height: {
+    type: "number",
+    default: 1080,
+  },
   subjectImage: {
     type: "image",
     label: "Subject image",
+  },
+  backgroundImage: {
+    type: "image",
+    label: "Background image",
   },
   overlayImage: {
     type: "image",
@@ -195,29 +196,23 @@ export const inputs = {
     step: 1,
     slider: true,
   },
-  backgroundImage: {
-    type: "image",
-    label: "Background image",
-  },
-  theme: {
+  overlayColor: {
     type: "text",
     default: "Random",
-    options: ["Random", "white", "g10", "g90", "g100"],
-    label: "Carbon theme",
+    options: ["Random", "Teal", "Blue", "Green", "Cool gray"],
+    label: "Overlay color",
   },
-  tint: {
+  overlayTint: {
     type: "text",
     default: "Random",
-    options: ["Random", "Red", "Yellow", "Green", "Blue", "Purple"],
-    label: "Overlay tint",
+    options: ["Random", "10", "30", "60", "90"],
+    label: "Overlay value",
   },
-  width: {
-    type: "number",
-    default: 1920,
-  },
-  height: {
-    type: "number",
-    default: 1080,
+  backgroundColor: {
+    type: "text",
+    default: "Random",
+    options: ["Random", "Light", "Dark"],
+    label: "Background color",
   },
 };
 
